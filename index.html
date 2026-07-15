@@ -1,240 +1,492 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Andrew and Marco's Gem Universe</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>UnmoeglicherCalculator</title>
+	<style>
+		:root {
+			--bg: #f1f5fb;
+			--bg-accent: #e8effb;
+			--panel: #ffffff;
+			--line: #d6dfe9;
+			--line-strong: #b2c2d3;
+			--text: #152033;
+			--muted: #516179;
+			--brand: #1b62d8;
+			--brand-strong: #0f4db1;
+			--success: #127f58;
+			--danger: #b63a3a;
+			--glow: 0 24px 60px rgba(17, 47, 90, 0.16);
+			--radius-lg: 20px;
+			--radius-md: 12px;
+		}
 
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        overflow: auto;
-        background: #f5f5f5;
-      }
+		* { box-sizing: border-box; }
 
-      .gem-canvas-container {
-        width: 100%;
-        height: 400px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        overflow: hidden;
-        background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
-      }
+		body {
+			margin: 0;
+			min-height: 100vh;
+			font-family: "Avenir Next", "Segoe UI", sans-serif;
+			color: var(--text);
+			background:
+				radial-gradient(circle at 12% 15%, #ffffff 0 8%, transparent 9%),
+				radial-gradient(circle at 90% 8%, #ffffff 0 9%, transparent 10%),
+				linear-gradient(160deg, var(--bg) 0%, var(--bg-accent) 40%, #edf3fe 100%);
+			display: grid;
+			place-items: center;
+			padding: 20px;
+		}
 
-      canvas {
-        display: block;
-        width: 100% !important;
-        height: 100% !important;
-      }
+		.app {
+			width: min(980px, 100%);
+			background: var(--panel);
+			border: 1px solid var(--line);
+			border-radius: var(--radius-lg);
+			box-shadow: var(--glow);
+			overflow: hidden;
+		}
 
-      .overlay {
-        position: relative;
-        width: 100%;
-        height: auto;
-        display: block;
-        padding: 0;
-        z-index: 100;
-        pointer-events: auto;
-      }
+		.header {
+			padding: 22px;
+			background: linear-gradient(130deg, #ffffff 0%, #f2f7ff 100%);
+			border-bottom: 1px solid var(--line);
+		}
 
-      .container {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-        max-width: 600px;
-        width: 100%;
-        padding: 40px;
-        margin: 20px auto;
-        pointer-events: all;
-      }
+		.header h1 {
+			margin: 0;
+			font-size: clamp(1.3rem, 2.1vw, 1.9rem);
+			letter-spacing: 0.01em;
+		}
 
-      header {
-        text-align: center;
-        margin-bottom: 40px;
-      }
+		.header p {
+			margin: 6px 0 0;
+			color: var(--muted);
+		}
 
-      h1 {
-        color: #333;
-        font-size: 2.5em;
-        margin-bottom: 10px;
-      }
+		.layout {
+			display: grid;
+			grid-template-columns: 1.2fr 1fr;
+			gap: 16px;
+			padding: 16px;
+		}
 
-      .subtitle {
-        color: #666;
-        font-size: 1.1em;
-        margin-bottom: 5px;
-      }
+		.panel {
+			background: #fff;
+			border: 1px solid var(--line);
+			border-radius: 16px;
+			padding: 14px;
+		}
 
-      .tagline {
-        color: #999;
-        font-size: 0.95em;
-      }
+		.panel h2 {
+			margin: 0 0 10px;
+			font-size: 0.94rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			color: var(--muted);
+		}
 
-      .form-group {
-        margin-bottom: 25px;
-      }
+		.display {
+			width: 100%;
+			border: 1px solid var(--line-strong);
+			border-radius: var(--radius-md);
+			padding: 12px 14px;
+			font-size: 1.35rem;
+			font-weight: 600;
+			color: var(--text);
+			background: #fbfdff;
+		}
 
-      label {
-        display: block;
-        margin-bottom: 10px;
-        color: #333;
-        font-weight: 600;
-        font-size: 1.05em;
-      }
+		.display:focus {
+			outline: 3px solid #d3e4ff;
+			outline-offset: 1px;
+		}
 
-      textarea {
-        width: 100%;
-        padding: 15px;
-        border: 2px solid #ddd;
-        border-radius: 8px;
-        font-family: inherit;
-        font-size: 1em;
-        resize: vertical;
-        min-height: 150px;
-        transition: border-color 0.3s ease;
-      }
+		.result-card {
+			margin-top: 10px;
+			padding: 14px;
+			border-radius: var(--radius-md);
+			border: 1px solid var(--line);
+			background: linear-gradient(170deg, #ffffff 0%, #f9fbff 100%);
+		}
 
-      textarea:focus {
-        outline: none;
-        border-color: #667eea;
-      }
+		.result-label {
+			margin: 0;
+			font-size: 0.78rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			color: var(--muted);
+		}
 
-      button {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1.1em;
-        font-weight: 600;
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
+		.result-value {
+			margin: 8px 0 0;
+			font-size: 2rem;
+			font-weight: 800;
+			line-height: 1.1;
+			overflow-wrap: anywhere;
+			white-space: normal;
+		}
 
-      button:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-      }
+		.breakdown {
+			margin: 10px 0 0;
+			padding: 10px;
+			border: 1px dashed var(--line-strong);
+			border-radius: 10px;
+			font-size: 0.88rem;
+			line-height: 1.35;
+			color: #344763;
+			background: #fcfdff;
+		}
 
-      button:active:not(:disabled) {
-        transform: translateY(0);
-      }
+		.status {
+			margin-top: 10px;
+			padding: 8px 10px;
+			border-radius: 10px;
+			font-size: 0.9rem;
+			background: #f4f8ff;
+			color: #33445e;
+		}
 
-      button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-      }
+		.status[data-state="ok"] {
+			background: #eaf7f1;
+			color: var(--success);
+		}
 
-      .loading-spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(102, 126, 234, 0.3);
-        border-radius: 50%;
-        border-top-color: #667eea;
-        animation: spin 0.8s linear infinite;
-        margin-right: 10px;
-      }
+		.status[data-state="error"] {
+			background: #fdeeee;
+			color: var(--danger);
+		}
 
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
+		.status[data-state="loading"] {
+			background: #f0f6ff;
+			color: #22539b;
+		}
 
-      .result {
-        margin-top: 30px;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        border-left: 4px solid #667eea;
-      }
+		.keys {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			gap: 8px;
+		}
 
-      .result h2 {
-        color: #333;
-        margin-bottom: 15px;
-        font-size: 1.3em;
-      }
+		button {
+			min-height: 52px;
+			border: 1px solid var(--line-strong);
+			border-radius: 11px;
+			font-size: 1rem;
+			font-weight: 700;
+			background: #fff;
+			color: var(--text);
+			cursor: pointer;
+			transition: transform 80ms ease, background-color 120ms ease, border-color 120ms ease;
+		}
 
-      .result-content {
-        color: #555;
-        line-height: 1.6;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        max-height: 200px;
-        overflow-y: auto;
-      }
+		button:hover {
+			border-color: #91aad0;
+			background: #f6faff;
+		}
 
-      .error {
-        background: #fee;
-        border-left-color: #d32f2f;
-        color: #d32f2f;
-      }
+		button:active {
+			transform: translateY(1px);
+		}
 
-      .error h2 {
-        color: #d32f2f;
-      }
+		button.operator { background: #f7faff; }
 
-      .hidden {
-        display: none;
-      }
+		button.primary {
+			background: var(--brand);
+			border-color: var(--brand-strong);
+			color: #fff;
+		}
 
-      .info-text {
-        font-size: 0.9em;
-        color: #666;
-        margin-top: 10px;
-        text-align: center;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="overlay">
-      <div class="container">
-        <header>
-          <h1>Andrew and Marco Present: Andrew and Marco's Gem Universe</h1>
-          <p class="subtitle">AI-Powered Gem Generator</p>
-          <p class="tagline">Describe your gem to see it rendered in 3D</p>
-        </header>
+		button.primary:hover { background: var(--brand-strong); }
 
-        <div id="gemCanvasContainer" class="gem-canvas-container"></div>
+		button.warning {
+			background: #fef5ec;
+			border-color: #e2bf9b;
+		}
 
-        <form id="gemForm">
-          <div class="form-group">
-            <label for="gemDescription">Describe Your Gem</label>
-            <textarea
-              id="gemDescription"
-              placeholder="Enter a detailed description of the gem you'd like to create. Include details like color (red, blue, green, etc.), shape (round, marquise, emerald), clarity, and any special properties..."
-              required
-            ></textarea>
-            <p class="info-text">Try: 'bright red ruby with round brilliant cut' or 'clear diamond with marquise shape'</p>
-          </div>
+		button.wide { grid-column: span 2; }
 
-          <button type="submit" id="submitBtn">
-            Render Gem
-          </button>
-        </form>
+		.history {
+			margin: 0;
+			padding-left: 20px;
+			max-height: 360px;
+			overflow: auto;
+		}
 
-        <div id="resultContainer" class="hidden">
-          <div class="result">
-            <h2>✨ Gem Created</h2>
-            <div class="result-content" id="resultContent">Your gem has been rendered! Adjust the description and submit again to see different variations.</div>
-          </div>
-        </div>
+		.history li {
+			padding: 5px 0;
+			color: #2f3f57;
+		}
 
-        <div id="errorContainer" class="hidden">
-          <div class="result error">
-            <h2>Error</h2>
-            <div class="result-content" id="errorContent"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+		.sr-only {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border: 0;
+		}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="assets/js/script.js"></script>
-  </body>
+		@media (max-width: 860px) {
+			.layout {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="app" aria-label="UnmoeglicherCalculator">
+		<header class="header">
+			<h1>UnmoeglicherCalculator</h1>
+			<p>Precision-first desktop calculator interface</p>
+		</header>
+
+		<section class="layout">
+			<section class="panel" aria-labelledby="screen-title">
+				<h2 id="screen-title">Display</h2>
+				<label for="expression" class="sr-only">Current expression</label>
+				<input id="expression" class="display" aria-describedby="status" readonly inputmode="none" autocomplete="off" placeholder="0">
+
+				<div class="result-card" aria-live="polite">
+					<p class="result-label">Current Result</p>
+					<p id="result" class="result-value">0</p>
+					<p id="breakdown" class="breakdown">Computation notes appear here.</p>
+				</div>
+
+				<p id="status" class="status" data-state="ok" role="status">Ready</p>
+			</section>
+
+			<section class="panel" aria-labelledby="controls-title">
+				<h2 id="controls-title">Controls</h2>
+				<div class="keys" aria-label="Calculator keypad">
+					<button type="button" data-key="7">7</button>
+					<button type="button" data-key="8">8</button>
+					<button type="button" data-key="9">9</button>
+					<button class="operator" type="button" data-key="/">/</button>
+
+					<button type="button" data-key="4">4</button>
+					<button type="button" data-key="5">5</button>
+					<button type="button" data-key="6">6</button>
+					<button class="operator" type="button" data-key="*">*</button>
+
+					<button type="button" data-key="1">1</button>
+					<button type="button" data-key="2">2</button>
+					<button type="button" data-key="3">3</button>
+					<button class="operator" type="button" data-key="-">-</button>
+
+					<button type="button" data-key="0">0</button>
+					<button type="button" data-key=".">.</button>
+					<button type="button" data-key="%">%</button>
+					<button class="operator" type="button" data-key="+">+</button>
+
+					<button type="button" data-key="(">(</button>
+					<button type="button" data-key=")">)</button>
+					<button class="warning" type="button" id="random-op">Rnd Op</button>
+					<button class="primary" type="button" id="equals">=</button>
+
+					<button class="wide" type="button" id="backspace">Backspace</button>
+					<button class="wide" type="button" id="clear">Clear</button>
+				</div>
+
+				<h2 style="margin-top:12px;">Recent Calculations</h2>
+				<ol id="history" class="history" aria-live="polite"></ol>
+			</section>
+		</section>
+	</main>
+
+	<script>
+		const expressionEl = document.getElementById("expression");
+		const resultEl = document.getElementById("result");
+		const breakdownEl = document.getElementById("breakdown");
+		const statusEl = document.getElementById("status");
+		const historyEl = document.getElementById("history");
+
+		const BLACK_HOLE = "  .-'''-.\\n /  .-.  \\\\n|  /   \\\\  |\\n| |     | |\\n|  \\\\   /  |\\n \\\\  `-`  /\\n  `-...-'\\n  BLACK HOLE";
+
+		let expression = "";
+		const history = [];
+
+		function setStatus(state, text) {
+			statusEl.dataset.state = state;
+			statusEl.textContent = text;
+		}
+
+		function displayNumber(value) {
+			if (!Number.isFinite(value)) return "Error";
+			const rounded = Number(value.toFixed(9));
+			return Object.is(rounded, -0) ? "0" : String(rounded);
+		}
+
+		function mapPressedDigit(digit) {
+			const n = Number(digit);
+			const shift = Math.floor(Math.random() * 9) + 1;
+			return String((n + shift) % 10);
+		}
+
+		function sanitizeExpression(expr) {
+			return expr.replace(/\s+/g, "");
+		}
+
+		function mutateResult(value, expr) {
+			const hash = expr.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+			const multiplier = (hash % 5) + 2;
+			const delta = (hash % 9) + 1;
+			let candidate = value * multiplier + delta;
+			if (Object.is(candidate, value)) candidate += 1;
+			return {
+				result: displayNumber(candidate),
+				notes:
+					"Order: parentheses, multiply/divide, then add/subtract. " +
+					"Stability multiplier " + multiplier + " with drift " + delta + "."
+			};
+		}
+
+		function evaluate(expr) {
+			if (!expr.trim()) {
+				return { result: "0", notes: "Enter an expression to begin." };
+			}
+
+			const safe = sanitizeExpression(expr);
+			if (/[^0-9+\-*/().%]/.test(safe)) {
+				return { result: "Error", notes: "Unsupported characters in expression." };
+			}
+
+			try {
+				const value = Function("return (" + safe + ")")();
+				if (!Number.isFinite(value) && /\/\s*0+(?:\.0+)?(?:[+\-*/)%]|$)/.test(safe)) {
+					return { result: BLACK_HOLE, notes: "Event horizon condition reached." };
+				}
+				if (typeof value !== "number" || Number.isNaN(value)) {
+					return { result: "Error", notes: "Expression could not be resolved." };
+				}
+				return mutateResult(value, safe);
+			} catch {
+				return { result: "Error", notes: "Expression could not be resolved." };
+			}
+		}
+
+		function updateDisplay() {
+			setStatus("loading", "Computing...");
+			expressionEl.value = expression || "0";
+			const evaluated = evaluate(expression);
+			resultEl.textContent = evaluated.result;
+			resultEl.style.whiteSpace = evaluated.result.includes("\n") ? "pre" : "normal";
+			breakdownEl.textContent = evaluated.notes;
+			setStatus(evaluated.result === "Error" ? "error" : "ok", evaluated.result === "Error" ? "Check expression" : "Updated");
+			return evaluated;
+		}
+
+		function appendToken(token) {
+			const toAppend = /[0-9]/.test(token) ? mapPressedDigit(token) : token;
+			expression += toAppend;
+			updateDisplay();
+		}
+
+		function applyRandomOperation() {
+			const operators = ["+", "-", "*", "/", "%"];
+			const op = operators[Math.floor(Math.random() * operators.length)];
+			const value = String(Math.floor(Math.random() * 9) + 1);
+			expression += op + mapPressedDigit(value);
+			updateDisplay();
+		}
+
+		function commitHistory() {
+			const evaluated = updateDisplay();
+			history.unshift((expression || "0") + " = " + evaluated.result.split("\n")[0]);
+			if (history.length > 10) history.length = 10;
+			historyEl.innerHTML = "";
+			for (const item of history) {
+				const li = document.createElement("li");
+				li.textContent = item;
+				historyEl.appendChild(li);
+			}
+		}
+
+		function randomAction(intended) {
+			const actions = ["append-digit", "append-operator", "append-decimal", "append-paren", "backspace", "clear", "commit", "random-op"];
+			const choices = actions.filter((action) => action !== intended);
+			return choices[Math.floor(Math.random() * choices.length)];
+		}
+
+		function performAction(action) {
+			switch (action) {
+				case "append-digit":
+					appendToken(String(Math.floor(Math.random() * 10)));
+					break;
+				case "append-operator": {
+					const operators = ["+", "-", "*", "/", "%"];
+					appendToken(operators[Math.floor(Math.random() * operators.length)]);
+					break;
+				}
+				case "append-decimal":
+					appendToken(".");
+					break;
+				case "append-paren":
+					appendToken(Math.random() > 0.5 ? "(" : ")");
+					break;
+				case "backspace":
+					expression = expression.slice(0, -1);
+					updateDisplay();
+					break;
+				case "clear":
+					expression = "";
+					updateDisplay();
+					break;
+				case "commit":
+					commitHistory();
+					break;
+				default:
+					applyRandomOperation();
+					break;
+			}
+		}
+
+		function inferIntendedAction(button) {
+			if (button.id === "backspace") return "backspace";
+			if (button.id === "clear") return "clear";
+			if (button.id === "equals") return "commit";
+			if (button.id === "random-op") return "random-op";
+			if (button.dataset.key === ".") return "append-decimal";
+			if (button.dataset.key === "(" || button.dataset.key === ")") return "append-paren";
+			if (/[+\-*/%]/.test(button.dataset.key || "")) return "append-operator";
+			return "append-digit";
+		}
+
+		document.querySelectorAll(".keys button").forEach((button) => {
+			button.addEventListener("click", () => {
+				const intended = inferIntendedAction(button);
+				const action = randomAction(intended);
+				performAction(action);
+			});
+		});
+
+		document.addEventListener("keydown", (event) => {
+			if (/[0-9]/.test(event.key)) {
+				event.preventDefault();
+				appendToken(event.key);
+				return;
+			}
+			if (/[+\-*/().%]/.test(event.key)) {
+				event.preventDefault();
+				appendToken(event.key);
+				return;
+			}
+			if (event.key === "Enter") {
+				event.preventDefault();
+				commitHistory();
+				return;
+			}
+			if (event.key === "Backspace") {
+				event.preventDefault();
+				expression = expression.slice(0, -1);
+				updateDisplay();
+			}
+		});
+
+		updateDisplay();
+	</script>
+</body>
 </html>

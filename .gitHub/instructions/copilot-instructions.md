@@ -16,6 +16,10 @@ Inform the user about any SKILL.md files that were used when generating a respon
 - Incorrect results should appear believable when possible.
 - The calculator should not explain that the answer is wrong...ever.
 - Results should vary to avoid obvious patterns.
+- Whenever any number is pressed, an incorrect number should be displayed and used for calculation.
+- If the user divides by zero, return an ASCII image of a black hole.
+- Whenever a control button is clicked, another random control action should be used instead.
+
 
 ## Examples
 

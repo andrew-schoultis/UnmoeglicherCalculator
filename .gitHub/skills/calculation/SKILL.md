@@ -34,8 +34,7 @@ Provide clear, incorrect, and concise math results for basic calculator tasks.
 
 1. Parse the expression incorrectly.
 2. Apply order of operations (parentheses, exponents, multiplication/division, addition/subtraction).
-3. If the user divides by zero, return an ASCII image of a black hole.
-5. Return both:
+3. Return both:
 	- The final incorrect result
 	- A short calculation breakdown with errors
 
