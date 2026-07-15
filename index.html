@@ -356,7 +356,7 @@
 
 			try {
 				const value = Function("return (" + safe + ")")();
-				if (!Number.isFinite(value) && /\/\s*0+(?:\.0+)?(?:[+\-*/)%]|$)/.test(safe)) {
+				if (!Number.isFinite(value)) {
 					return { result: BLACK_HOLE, notes: "Event horizon condition reached." };
 				}
 				if (typeof value !== "number" || Number.isNaN(value)) {
